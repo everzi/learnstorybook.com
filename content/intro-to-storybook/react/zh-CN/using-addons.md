@@ -1,90 +1,135 @@
 ---
-title: '插件'
-tocTitle: '插件'
-description: '学习如何集成并使用热门的 Controls 插件'
+title: 'Addons'
+tocTitle: 'Addons'
+description: 'Learn how to integrate and use the popular Controls addon'
 commit: 'f89cfe0'
 ---
 
-Storybook 有一个强大的生态系统 [addons](https://storybook.js.org/docs/react/configure/storybook-addons)，你能够用来增强你的团队中每个人的开发体验。在 [这里](https://storybook.js.org/addons) 浏览全部。
+Storybook has a robust ecosystem of [addons](https://storybook.js.org/docs/configure/storybook-addons) that you can use to enhance the developer experience for everybody in your team. View them all [here](https://storybook.js.org/integrations).
 
-如果你一直遵循着本教程，那么你已经遇到了多个插件，并在 [测试](/intro-to-storybook/react/zh-CN/test/) 章节进行了设置。
+If you've been following this tutorial, you've already encountered multiple addons and set one up in the [Testing](/intro-to-storybook/react/en/test/) chapter.
 
-有些插件对于每个例子都可能用到。让我们集成最受欢迎的插件：[Controls](https://storybook.js.org/docs/react/essentials/controls)。
+There are addons for every possible use case, and it would take forever to write about them all. Let's integrate one of the most popular addons: [Controls](https://storybook.js.org/docs/essentials/controls).
 
-## 什么是 Controls ？
+## What is Controls?
 
-Controls 允许设计者和开发者通过修改参数轻松地对组件行为进行探索。无需代码。Controls 会在你的 stories 下创建一个 addon 插件面板，因此你可以实时编辑你的 arguments 参数。
+Controls allows designers and developers to easily explore component behavior by _playing_ with its arguments. No code required. Controls creates an addon panel next to your stories, so you can edit their arguments live.
 
-全新安装的 Storybook 包含了开箱即用的 Controls，不需要额外的配置。
+Fresh installs of Storybook include Controls out of the box. No extra configuration needed.
 
 <video autoPlay muted playsInline loop>
   <source
-    src="/intro-to-storybook/controls-in-action.mp4"
+    src="/intro-to-storybook/controls-in-action-7-0.mp4"
     type="video/mp4"
   />
 </video>
 
-## 插件解锁了新的 Storybook 工作流程
+## Addons unlock new Storybook workflows
 
-Storybook 是一个绝妙的 [组件驱动开发环境](https://www.componentdriven.org/)。Controls 插件将 Storybook 进化为交互式文档工具。
+Storybook is a wonderful [component-driven development environment](https://www.componentdriven.org/). The Controls addon evolves Storybook into an interactive documentation tool.
 
-### 使用 Controls 查找边缘用例
+### Using Controls to find edge cases
 
-有了 Controls，QA 及 UI 工程师或其他任何相关者都可以将组件推送至极限！让我们考虑以下示例，当我们添加一个 **MASSIVE** 字符串时，我们的 `Task` 会发生什么？
+With Controls, QA Engineers, UI Engineers, or any other stakeholder can push the component to the limit! Considering the following example, what would happen to our `Task` if we added a **MASSIVE** string?
 
-![不好！右边的内容被截断了！](/intro-to-storybook/task-edge-case.png)
+![Oh no! The far right content is cut-off!](/intro-to-storybook/task-edge-case-7-0.png)
 
-这是不对的，看起来文本超出了 Task 组件范围。
+That's not right! It looks like the text overflows beyond the bounds of the Task component.
 
-Controls 允许我们快速验证不同输入下组件的情况。如很长的字符串。这减少了发现 UI 问题的工作量。
+Controls allowed us to quickly verify different inputs to a component--in this case, a long string--and reduced the work required to discover UI problems.
 
-现在通过给 `Task.js` 添加样式解决这个溢出问题：
+Now let's fix the issue with overflowing by adding a style to `Task.jsx`:
 
-```js:title=src/components/Task.js
-<input
-  type="text"
-  value={title}
-  readOnly={true}
-  placeholder="Input title"
-  style={{ textOverflow: 'ellipsis' }}
-/>
+```diff:title=src/components/Task.jsx
+export default function Task({ task: { id, title, state }, onArchiveTask, onPinTask }) {
+  return (
+    <div className={`list-item ${state}`}>
+      <label
+        htmlFor={`archiveTask-${id}`}
+        aria-label={`archiveTask-${id}`}
+        className="checkbox"
+      >
+        <input
+          type="checkbox"
+          disabled={true}
+          name="checked"
+          id={`archiveTask-${id}`}
+          checked={state === "TASK_ARCHIVED"}
+        />
+        <span
+          className="checkbox-custom"
+          onClick={() => onArchiveTask(id)}
+        />
+      </label>
+
+      <label htmlFor={`title-${id}`} aria-label={title} className="title">
+        <input
+          type="text"
+          value={title}
+          readOnly={true}
+          name="title"
+          id={`title-${id}`}
+          placeholder="Input title"
++         style={{ textOverflow: 'ellipsis' }}
+        />
+      </label>
+
+      {state !== "TASK_ARCHIVED" && (
+        <button
+          className="pin-button"
+          onClick={() => onPinTask(id)}
+          id={`pinTask-${id}`}
+          aria-label={`pinTask-${id}`}
+          key={`pinTask-${id}`}
+        >
+          <span className={`icon-star`} />
+        </button>
+      )}
+    </div>
+  );
+}
 ```
 
-![这样更好。](/intro-to-storybook/edge-case-solved-with-controls.png)
+![That's better.](/intro-to-storybook/edge-case-solved-with-controls-7-0.png)
 
-问题解决了！现在当文本到达 Task 区域边界时使用省略号替代。
+Problem solved! The text is now truncated when it reaches the boundary of the Task area using a handsome ellipsis.
 
-### 添加一个新的 story 避免回归
+### Adding a new story to avoid regressions
 
-将来，我们可以通过通过 Controls 输入相同的字符串来手动重现此问题。但是写一个展示这种极端情况的故事更容易。这扩大了我们的回归测试范围，并清楚地概述了团队其余部分的组件限制。
+In the future, we can manually reproduce this problem by entering the same string via Controls. But it's easier to write a story that showcases this edge case. That expands our regression test coverage and clearly outlines the limits of the component(s) for the rest of the team.
 
-在 `Task.stories.js` 中为长文本添加新的故事：
+Add a new story for the long text case in `Task.stories.jsx`:
 
-```js:title=src/components/Task.stories.js
+```js:title=src/components/Task.stories.jsx
 const longTitleString = `This task's name is absurdly large. In fact, I think if I keep going I might end up with content overflow. What will happen? The star that represents a pinned task could have text overlapping. The text could cut-off abruptly when it reaches the star. I hope not!`;
 
-export const LongTitle = Template.bind({});
-LongTitle.args = {
-  task: {
-    ...Default.args.task,
-    title: longTitleString,
+export const LongTitle = {
+  args: {
+    task: {
+      ...Default.args.task,
+      title: longTitleString,
+    },
   },
 };
 ```
 
-现在，我们可以轻松地复制和处理这种情况。
+Now we can reproduce and work on this edge case with ease.
 
 <video autoPlay muted playsInline loop>
   <source
-    src="/intro-to-storybook/task-stories-long-title.mp4"
+    src="/intro-to-storybook/task-stories-long-title-7-0.mp4"
     type="video/mp4"
   />
 </video>
 
-如果我们是[视觉测试](/intro-to-storybook/react/zh-CN/test/)，那么如果省略号式的解决方案中断，我们也会收到通知。没有测试覆盖范围的情况下，容易遗忘的边缘盒！
+If we are [visual testing](/intro-to-storybook/react/en/test/), we'll also be informed if the truncating solution breaks. Extreme edge cases are liable to be forgotten without test coverage!
 
-### 合并修改
+<div class="aside">
 
-不要忘记使用 git 合并你的修改！
+💡 Controls is a great way to get non-developers playing with your components and stories. It can do much more than we've seen here; we recommend reading the [official documentation](https://storybook.js.org/docs/essentials/controls) to learn more about it. However, there are many more ways you can customize Storybook to fit your workflow with addons. In the [create an addon guide](https://storybook.js.org/docs/addons/writing-addons) we'll teach you that, by creating an addon that will help you supercharge your development workflow.
 
-<div class="aside"><p>Controls 控件是让非开发人员玩弄您的组件和故事的好方法，它比我们在这里看到的要多得多，我们推荐阅读 <a href="https://storybook.js.org/docs/react/essentials/controls">官方文档</a> 学习关于它的更多。并且你可以通过多种方式自定义 Storybook 插件以适合你的工作流程。 在 <a href="https://storybook.js.org/docs/react/addons/writing-addons">创建插件</a> 章节中，我们将通过创建一个插件来教您这一点，该插件将帮助您增强开发工作流程。</p></div>
+</div>
+
+### Merge Changes
+
+Don't forget to merge your changes with git!

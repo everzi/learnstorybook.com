@@ -1,65 +1,53 @@
 ---
-title: '部署 Storybook'
-tocTitle: '部署'
-description: '学习如何在线部署 Storybook'
+title: 'Deploy Storybook'
+tocTitle: 'Deploy'
+description: 'Learn how to deploy Storybook online'
 commit: '59da1ac'
 ---
 
-在本教程中,我们在开发机器上运行了 Storybook. 您可能还想与团队分享该 Storybook,尤其是非技术成员. 值得庆幸的是,在线部署 Storybook 很容易.
+Throughout this tutorial, we built components on our local development machine. At some point, we'll need to share our work to get team feedback. Let's deploy Storybook online to help teammates review UI implementation.
 
-## 导出为静态应用程序
+## Exporting as a static app
 
-要部署 Storybook 我们首先需要导出一个静态 web 应用程序。这个功能已经内置到了 Storybook 中并且已经预先配置。
+To deploy Storybook, we first need to export it as a static web app. This functionality is already built-in to Storybook and pre-configured.
 
-现在当你运行 `npm run build-storybook`，它在 `storybook-static` 目录输出一个静态的 Storybook。然后可以将其部署到任何静态站点托管服务。
+Running `yarn build-storybook` will output a static Storybook in the `storybook-static` directory, which can then be deployed to any static site hosting service.
 
-## 发布 Storybook
+## Publish Storybook
 
-本教程使用 <a href="https://www.chromatic.com/?utm_source=storybook_website&utm_medium=link&utm_campaign=storybook">Chromatic</a>，这是一个有 Storybook 维护者提供的一个免费发布托管服务。它允许我们安全可靠的部署和托管我们的 Storybook。
+This tutorial uses [Chromatic](https://www.chromatic.com/?utm_source=storybook_website&utm_medium=link&utm_campaign=storybook), a free publishing service made by the Storybook maintainers. It allows us to deploy and host our Storybook safely and securely in the cloud.
 
-### GitHub 仓库设置
+### Set up a repository in GitHub
 
-在我们开始前，我们本地需要与远程控制服务版本同步。在[开始吧 章节](/intro-to-storybook/react/zh-CN/get-started/)中我们的项目已经初始化，Create React App (CRA) 已经为我们创建了一个本地仓库。在此阶段，我们添加文件完成第一次提交是安全的。
+Before we begin, our local code needs to sync with a remote version control service. When we set up our project in the [Get started chapter](/intro-to-storybook/react/en/get-started/), we already initialized a local repository. At this stage, we already have a set of commits that we can push to a remote one.
 
-发出以下命令以添加并提交目前为止我们的所有修改。
-
-```shell
-git add .
-```
-
-其次是：
-
-```shell
-git commit -m "taskbox UI"
-```
-
-转到 GitHub 并设置存储库[这里](https://github.com/new)。将您的仓库命名为"taskbox"，与我们的本地项目相同。
+Go to GitHub and create a new repository for our project [here](https://github.com/new). Name the repo “taskbox”, same as our local project.
 
 ![GitHub setup](/intro-to-storybook/github-create-taskbox.png)
 
-在新的 repo 设置中，复制 repo 的原始 URL，并使用以下命令将其添加到 git 项目中：
+In the new repo, grab the origin URL of the repo and add it to your git project with this command:
 
 ```shell
 git remote add origin https://github.com/<your username>/taskbox.git
 ```
 
-最后将本地仓库推送到 GitHub 远程仓库
+Finally, push our local repo to the remote repo on GitHub with:
 
 ```shell
 git push -u origin main
 ```
 
-### 开始 Chromatic
+### Get Chromatic
 
-添加包作为开发环境依赖。
+Add the package as a development dependency.
 
 ```shell
 yarn add -D chromatic
 ```
 
-当依赖包安装完成时，[登录 Chromatic](https://www.chromatic.com/start/?utm_source=storybook_website&utm_medium=link&utm_campaign=storybook) 以及 Github 账号（Chromatic 仅要求一些轻量的权限）。接下来我们将创建一个新仓库命名为“taskbox”并同步到我们设置好的 Github 仓库。
+Once the package is installed, [log in to Chromatic](https://www.chromatic.com/start/?utm_source=storybook_website&utm_medium=link&utm_campaign=storybook) with your GitHub account (Chromatic will only ask for lightweight permissions), then we'll create a new project called "taskbox" and sync it with the GitHub repository we've set up.
 
-点击协作者下的 `Choose GitHub repo` 并选择你的仓库。
+Click `Choose GitHub repo` under collaborators and select your repo.
 
 <video autoPlay muted playsInline loop style="width:520px; margin: 0 auto;">
   <source
@@ -68,7 +56,7 @@ yarn add -D chromatic
   />
 </video>
 
-复制为你的项目生成的唯一 `project-token`。执行下面的命令行，构建并部署我们的 Storybook。确保将 `project-token` 替换为你项目的 `project-token`。
+Copy the unique `project-token` that was generated for your project. Then execute it by issuing the following in the command line to build and deploy our Storybook. Make sure to replace `project-token` with your project token.
 
 ```shell
 yarn chromatic --project-token=<project-token>
@@ -76,21 +64,21 @@ yarn chromatic --project-token=<project-token>
 
 ![Chromatic running](/intro-to-storybook/chromatic-manual-storybook-console-log.png)
 
-当完成后，你将得到一个链接 `https://random-uuid.chromatic.com` 到已发布的 Storybook。分享该链接到你的团队中获得反馈。
+When finished, you'll get a link `https://random-uuid.chromatic.com` to your published Storybook. Share the link with your team to get feedback.
 
-![Storybook deployed with chromatic package](/intro-to-storybook/chromatic-manual-storybook-deploy-6-0.png)
+![Storybook deployed with chromatic package](/intro-to-storybook/chromatic-manual-storybook-deploy.png)
 
-不错！我们通过一行命令发布了 Storybook，但是每次我们想要获得 UI 实现的反馈时都需要手动执行命令。理想的情况是，每当我们推送代码时发布组件的最新版本。我们需要不断部署 Storybook。
+Hooray! We published Storybook with one command, but manually running a command every time we want to get feedback on UI implementation is repetitive. Ideally, we'd publish the latest version of components whenever we push code. We'll need to continuously deploy Storybook.
 
-## 使用 Chromatic 持续部署
+## Continuous deployment with Chromatic
 
-现在我们的项目托管在 Github 仓库，我们能够使用持续集成 CI 服务完成 Storybook 自动化部署。[GitHub Actions](https://github.com/features/actions) 是一个免费的 CI 服务，内置在 Github 中，轻松实现自动发布。
+Now that we've hosted our project in a GitHub repository, we can use a continuous integration (CI) service to deploy our Storybook automatically. [GitHub Actions](https://github.com/features/actions) is a free CI service that's built into GitHub that makes automatic publishing easy.
 
-### 添加 GitHub Action 部署 Storybook
+### Add a GitHub Action to deploy Storybook
 
-在项目根文件夹下创建一个新目录命名为 `.github` 并在其中创建另一个 `workflows` 目录。
+In the root folder of our project, create a new directory called `.github`, then create another `workflows` directory inside of it.
 
-像下面的一样，创建一个新文件命名为 `chromatic.yml`。将 `project-token` 替换为你项目的 project token。
+Create a new file called `chromatic.yml` like the one below.
 
 ```yaml:title=.github/workflows/chromatic.yml
 # Workflow name
@@ -101,52 +89,58 @@ on: push
 
 # List of jobs
 jobs:
-  test:
-    # Operating System
+  chromatic:
+    name: 'Run Chromatic'
     runs-on: ubuntu-latest
     # Job steps
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - run: yarn
         #👇 Adds Chromatic as a step in the workflow
-      - uses: chromaui/action@v1
+      - uses: chromaui/action@latest
         # Options required for Chromatic's GitHub Action
         with:
-          #👇 Chromatic projectToken, see https://storybook.js.org/tutorials/intro-to-storybook/react/zh-cn/deploy/ to obtain it
+          #👇 Chromatic projectToken, see https://storybook.js.org/tutorials/intro-to-storybook/react/en/deploy/ to obtain it
           projectToken: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
           token: ${{ secrets.GITHUB_TOKEN }}
 ```
 
-<div class="aside"><p>为了简洁起见，没有提到 <a href="https://help.github.com/en/actions/configuring-and-managing-workflows/creating-and-storing-encrypted-secrets">GitHub secrets</a> 。Secrets 是 Github 提供的一个安全环境变量是你不需要对 <code>project-token</code> 进行硬编码。</p></div>
+<div class="aside">
 
-### 提交 action
+💡 For brevity purposes [GitHub secrets](https://docs.github.com/en/actions/security-guides/encrypted-secrets#creating-encrypted-secrets-for-a-repository) weren't mentioned. Secrets are secure environment variables provided by GitHub so that you don't need to hard code the `project-token`.
 
-发出以下命令添加目前的修改：
+</div>
+
+### Commit the action
+
+In the command line, issue the following command to add the changes that you've made:
 
 ```shell
 git add .
 ```
 
-接下来提交：
+Then commit them by issuing:
 
 ```shell
 git commit -m "GitHub action setup"
 ```
 
-最后推送到远程分支：
+Finally, push them to the remote repository with:
 
 ```shell
 git push origin main
 ```
 
-设置了 GitHub action 后，当推送代码时，你的 Storybook 将部署到 Chromatic 上。你可以在 Chromatic 的构建屏幕中找到所有已发布的 Storybook。
+Once you’ve set up the GitHub action, your Storybook will be deployed to Chromatic whenever you push code. You can find all the published Storybooks on your project’s build screen in Chromatic.
 
-![Chromatic 用户仪表盘](/intro-to-storybook/chromatic-user-dashboard.png)
+![Chromatic user dashboard](/intro-to-storybook/chromatic-user-dashboard.png)
 
-提交表单以 构建和部署代码任务箱的`main`分支. 完成后,我们将在 Netlify 上 看到一条确认消息,其中包含指向 Taskbox 在线 Storybook 的链接.
+Click the latest build. It should be the one at the top.
 
-接下来点击 `View Storybook` 按钮查看 Storybook 的最新版。
+Then, click the `View Storybook` button to see the latest version of your Storybook.
 
-![Storybook 链接到 Chromatic](/intro-to-storybook/chromatic-build-storybook-link.png)
+![Storybook link on Chromatic](/intro-to-storybook/chromatic-build-storybook-link.png)
 
-使用链接分享给您的团队成员。作为标准应用程序开发过程的一部分，或仅用于展示工作 💅 都是有用的。
+Use the link and share it with your team members. It's helpful as a part of the standard app development process or simply to show off work 💅.
