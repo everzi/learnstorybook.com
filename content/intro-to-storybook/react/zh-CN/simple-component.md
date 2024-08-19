@@ -1,28 +1,28 @@
 ---
-title: 'Build a simple component'
-tocTitle: 'Simple component'
-description: 'Build a simple component in isolation'
+title: '构建一个简单的组件'
+tocTitle: '简单组件'
+description: '构建一个简单的独立的组件'
 commit: '9b36e1a'
 ---
 
-We’ll build our UI following a [Component-Driven Development](https://www.componentdriven.org/) (CDD) methodology. It’s a process that builds UIs from the “bottom-up”, starting with components and ending with screens. CDD helps you scale the amount of complexity you’re faced with as you build out the UI.
+我们将采用[组件驱动开发](https://www.componentdriven.org/)（CDD）的方法来构建我们的 UI。这种方法“自下而上”的构建 UI，先从组件开始，最后形成完整页面。CDD 有助于你在构建 UI 时逐步应对扩展复杂性。
 
-## Task
+## 任务（Task）
 
 ![Task component in three states](/intro-to-storybook/task-states-learnstorybook.png)
 
-`Task` is the core component of our app. Each task displays slightly differently depending on exactly what state it’s in. We display a checked (or unchecked) checkbox, some information about the task, and a “pin” button, allowing us to move tasks up and down the list. Putting this together, we’ll need these props:
+`Task` 是我们应用程序的核心组件。每个任务的显示会有所不同，具体取决于他所处的状态。我们会显示一个选中（或未选中）的复选框、任务的一些信息以及一个“pin”按钮，并允许我们在列表中上下移动任务。结合这些需求，我们需要以下 props：
 
-- `title` – a string describing the task
-- `state` - which list is the task currently in, and is it checked off?
+- `title` – 一个描述任务的字符串
+- `state` – 判断当前任务在哪个列表中，以及是否已完成？
 
-As we start to build `Task`, we first write our test states that correspond to the different types of tasks sketched above. Then we use Storybook to create the component in isolation using mocked data. We’ll manually test the component’s appearance given each state as we go.
+在开始构建 `Task` 时，我们首先编写对应于上面勾画的不同任务类型的测试状态。然后我们使用 Storybook 使用模拟数据创建独立的组件。在进行过程中，我们将在每种状态下手动测试组件的外观。
 
-## Get set up
+## 做好准备
 
-First, let’s create the task component and its accompanying story file: `src/components/Task.jsx` and `src/components/Task.stories.jsx`.
+首先，让我们创建任务组件及其附带的 story 文件：`src/components/Task.jsx` 和 `src/components/Task.stories.jsx`。
 
-We’ll begin with a baseline implementation of the `Task`, simply taking in the attributes we know we’ll need and the two actions you can take on a task (to move it between lists):
+我们将从 `Task` 的基础实现开始，只接收我们已知需要的属性和你可以在任务中执行的两个操作（在列表之间移动任务）：
 
 ```jsx:title=src/components/Task.jsx
 export default function Task({ task: { id, title, state }, onArchiveTask, onPinTask }) {
@@ -36,9 +36,9 @@ export default function Task({ task: { id, title, state }, onArchiveTask, onPinT
 }
 ```
 
-Above, we render straightforward markup for `Task` based on the existing HTML structure of the Todos application.
+上面，我们基于 Todos 应用的现有 HTML 结构直接渲染了 `Task` 的标记文本。
 
-Below we build out Task’s three test states in the story file:
+下面，我们在 story 文件中构建 Task 的三个测试状态：
 
 ```jsx:title=src/components/Task.stories.jsx
 import { fn } from "@storybook/test";
@@ -54,7 +54,7 @@ export default {
   component: Task,
   title: 'Task',
   tags: ['autodocs'],
-  //👇 Our exports that end in "Data" are not stories.
+  //👇 以“Data”结尾的导出不是stories。
   excludeStories: /.*Data$/,
   args: {
     ...ActionsData,
@@ -92,40 +92,40 @@ export const Archived = {
 
 <div class="aside">
 
-💡 [**Actions**](https://storybook.js.org/docs/essentials/actions) help you verify interactions when building UI components in isolation. Oftentimes you won't have access to the functions and state you have in context of the app. Use `fn()` to stub them in.
+💡 [**Actions**](https://storybook.js.org/docs/essentials/actions) 帮助你在构建独立的 UI 组件时验证交互。通常，你无法在应用上下文中访问你拥有的函数和状态。使用 `fn()` 来接入它们。
 
 </div>
 
-There are two basic levels of organization in Storybook: the component and its child stories. Think of each story as a permutation of a component. You can have as many stories per component as you need.
+Storybook 中有两个基本的组织级别：组件和其 child stories。可以将每个 story 视为组件的一个变体。你可以根据需要为每个组件添加任意数量的 stories。
 
 - **Component**
   - Story
   - Story
   - Story
 
-To tell Storybook about the component we are documenting and testing, we create a `default` export that contains:
+为了告诉 Storybook 关于我们正在文档化和测试的组件，我们创建一个 `default` 导出，其中包含：
 
-- `component` -- the component itself
-- `title` -- how to group or categorize the component in the Storybook sidebar
-- `tags` -- to automatically generate documentation for our components
-- `excludeStories`-- additional information required by the story but should not be rendered in Storybook
-- `args` -- define the action [args](https://storybook.js.org/docs/essentials/actions#action-args) that the component expects to mock out the custom events
+- `component` -- 组件本身
+- `title` -- 如何在 Storybook 侧边栏中分组或分类组件
+- `tags` -- 用于自动生成我们的组件文档
+- `excludeStories` -- story 所需的额外信息，但不应在 Storybook 中渲染
+- `args` -- 定义组件期望模拟自定义事件的操作[参数](https://storybook.js.org/docs/essentials/actions#action-args)
 
-To define our stories, we'll use Component Story Format 3 (also known as [CSF3](https://storybook.js.org/docs/api/csf) ) to build out each of our test cases. This format is designed to build out each of our test cases in a concise way. By exporting an object containing each component state, we can define our tests more intuitively and author and reuse stories more efficiently.
+为了定义我们的 stories，我们将使用 Component Story Format 3（也称为 [CSF3](https://storybook.js.org/docs/api/csf)）来构建每个测试用例。这种格式旨在以简洁的方式构建每个测试用例。通过导出包含每个组件状态的对象，我们可以更直观地定义测试和更高效地编写和重用 stories。
 
-Arguments or [`args`](https://storybook.js.org/docs/writing-stories/args) for short, allow us to live-edit our components with the controls addon without restarting Storybook. Once an [`args`](https://storybook.js.org/docs/writing-stories/args) value changes, so does the component.
+参数或 [`args`](https://storybook.js.org/docs/writing-stories/args) 允许我们通过控制插件实时编辑组件，而无需重启 Storybook。一旦 [`args`](https://storybook.js.org/docs/writing-stories/args) 的值发生变化，组件也会随之更新。
 
-`fn()` allows us to create a callback that appears in the **Actions** panel of the Storybook UI when clicked. So when we build a pin button, we’ll be able to determine if a button click is successful in the UI.
+`fn()` 允许我们创建一个在被点击时会出现在 Storybook UI 的 **Actions** 面板中的回调。因此，当我们构建一个固定按钮时，我们可以确定按钮点击是否在 UI 中成功。
 
-As we need to pass the same set of actions to all permutations of our component, it is convenient to bundle them up into a single `ActionsData` variable and pass them into our story definition each time. Another nice thing about bundling the `ActionsData` that a component needs is that you can `export` them and use them in stories for components that reuse this component, as we'll see later.
+由于我们需要将相同的操作集传递给组件的所有变体，将它们打包成一个 `ActionsData` 变量并每次传递到我们的 story 定义中是方便的。将组件需要的`ActionsData` 打包后的另一个优点是，你可以 `export` 它们，并在在复用该组件的组件 stories 中使用它们，如我们稍后将看到的那样。
 
-When creating a story, we use a base `task` arg to build out the shape of the task the component expects. Typically modeled from what the actual data looks like. Again, `export`-ing this shape will enable us to reuse it in later stories, as we'll see.
+在创建 story 时，我们使用一个基础 `task` 参数来构建组件期望的任务外形。通常根据实际数据的样子来建模。同样，导出此形状将使我们能够在后续 stories 中重用它，如我们将看到的那样。
 
-## Config
+## 配置
 
-We'll need to make a couple of changes to Storybook's configuration files so it notices our recently created stories and allows us to use the application's CSS file (located in `src/index.css`).
+我们需要对 Storybook 的配置文件做几处更改，以便它能识别我们最近创建的 stories，并允许我们使用应用的 CSS 文件（位于 `src/index.css`）。
 
-Start by changing your Storybook configuration file (`.storybook/main.js`) to the following:
+首先，将你的 Storybook 配置文件 (`.storybook/main.js`) 更改为以下内容：
 
 ```diff:title=.storybook/main.js
 /** @type { import('@storybook/react-vite').StorybookConfig } */
@@ -146,12 +146,12 @@ const config = {
 export default config;
 ```
 
-After completing the change above, inside the `.storybook` folder, change your `preview.js` to the following:
+完成上述更改后，在 `.storybook` 文件夹内，将 `preview.js` 更改为以下内容：
 
 ```diff:title=.storybook/preview.js
 + import '../src/index.css';
 
-//👇 Configures Storybook to log the actions( onArchiveTask and onPinTask ) in the UI.
+// 配置 Storybook 在 UI 中记录操作（`onArchiveTask` 和 `onPinTask`）。
 /** @type { import('@storybook/react').Preview } */
 const preview = {
   parameters: {
@@ -167,9 +167,9 @@ const preview = {
 export default preview;
 ```
 
-[`parameters`](https://storybook.js.org/docs/writing-stories/parameters) are typically used to control the behavior of Storybook's features and addons. In our case, we won't use them for that purpose. Instead, we will import our application's CSS file.
+[`parameters`](https://storybook.js.org/docs/writing-stories/parameters) 通常用于控制 Storybook 功能和插件的行为。在我们的例子中，我们不会将它们用于此目的。相反，我们将导入应用程序的 CSS 文件。
 
-Once we’ve done this, restarting the Storybook server should yield test cases for the three Task states:
+完成这一步后，重新启动 Storybook 服务器，应该会生成三个 Task 状态的测试用例：
 
 <video autoPlay muted playsInline loop>
   <source
@@ -178,11 +178,11 @@ Once we’ve done this, restarting the Storybook server should yield test cases 
   />
 </video>
 
-## Build out the states
+## 构建状态
 
-Now that we have Storybook set up, styles imported, and test cases built out, we can quickly start implementing the HTML of the component to match the design.
+现在，我们已经设置了 Storybook，导入了样式，并构建了测试用例，我们可以迅速开始实现组件的 HTML，以匹配设计。
 
-The component is still rudimentary at the moment. First, write the code that achieves the design without going into too much detail:
+目前组件仍然是基础的。首先，编写实现设计的代码，但不需要涉及太多细节：
 
 ```jsx:title=src/components/Task.jsx
 export default function Task({ task: { id, title, state }, onArchiveTask, onPinTask }) {
@@ -232,7 +232,7 @@ export default function Task({ task: { id, title, state }, onArchiveTask, onPinT
 }
 ```
 
-The additional markup from above combined with the CSS we imported earlier yields the following UI:
+上面的额外标记与我们之前导入的 CSS 结合后，生成了以下 UI：
 
 <video autoPlay muted playsInline loop>
   <source
@@ -241,9 +241,9 @@ The additional markup from above combined with the CSS we imported earlier yield
   />
 </video>
 
-## Specify data requirements
+## 指定数据必要条件
 
-It’s best practice to use `propTypes` in React to specify the shape of data that a component expects. Not only is it self-documenting, but it also helps catch problems early.
+在 React 中，使用 `propTypes` 来指定组件所期望的数据结构是一种最佳实践。它不仅具有自我文档化的作用，还可以帮助及早发现问题。
 
 ```diff:title=src/components/Task.jsx
 + import PropTypes from 'prop-types';
@@ -296,45 +296,45 @@ export default function Task({ task: { id, title, state }, onArchiveTask, onPinT
 + Task.propTypes = {
 +  /** Composition of the task */
 +  task: PropTypes.shape({
-+    /** Id of the task */
++    /** 任务的Id */
 +    id: PropTypes.string.isRequired,
-+    /** Title of the task */
++    /** 任务标题 */
 +    title: PropTypes.string.isRequired,
-+    /** Current state of the task */
++    /** 当前任务状态 */
 +    state: PropTypes.string.isRequired,
 +  }),
-+  /** Event to change the task to archived */
++  /** 将任务更改为已归档状态的事件 */
 +  onArchiveTask: PropTypes.func,
-+  /** Event to change the task to pinned */
++  /** 将任务更改为已固定状态的事件 */
 +  onPinTask: PropTypes.func,
 + };
 ```
 
-Now a warning in development will appear if the Task component is misused.
+现在，如果误用 Task 组件，在开发环境中会出现警告。
 
 <div class="aside">
-💡 An alternative way to achieve the same purpose is to use a JavaScript type system like TypeScript to create a type for the component properties.
+💡 实现相同目的的另一种方法是使用像 TypeScript 这样的 JavaScript 类型系统，为组件属性创建类型。
 </div>
 
-## Component built!
+## 组件构建!
 
-We’ve now successfully built out a component without needing a server or running the entire frontend application. The next step is to build out the remaining Taskbox components one by one in a similar fashion.
+我们现在已经成功构建了一个组件，无需服务器或运行整个前端应用程序。下一步是以类似的方式逐个构建其余的 Taskbox 组件。
 
-As you can see, getting started building components in isolation is easy and fast. We can expect to produce a higher-quality UI with fewer bugs and more polish because it’s possible to dig in and test every possible state.
+正如你所看到的，开始构建独立组件的过程既简单又快速。由于可以深入测试每种可能的状态，我们可以期望生产出更少漏洞和更完善的高质量 UI。
 
-## Catch accessibility issues
+## 发现可访问性问题
 
-Accessibility tests refer to the practice of auditing the rendered DOM with automated tools against a set of heuristics based on [WCAG](https://www.w3.org/WAI/standards-guidelines/wcag/) rules and other industry-accepted best practices. They act as the first line of QA to catch blatant accessibility violations ensuring that an application is usable for as many people as possible, including people with disabilities such as vision impairment, hearing problems, and cognitive conditions.
+可访问性测试是指使用自动化工具根据一组基于[WCAG](https://www.w3.org/WAI/standards-guidelines/wcag/) 规则和其他行业公认的最佳实践的启发式标准来审计渲染后 DOM 的实。它们作为质量保证的第一道防线，用于发现明显的可访问性违规问题，确保应用程序对尽可能多的人都可用，包括有视力障碍、听力问题和认知障碍的用户。
 
-Storybook includes an official [accessibility addon](https://storybook.js.org/addons/@storybook/addon-a11y). Powered by Deque's [axe-core](https://github.com/dequelabs/axe-core), it can catch up to [57% of WCAG issues](https://www.deque.com/blog/automated-testing-study-identifies-57-percent-of-digital-accessibility-issues/).
+Storybook 包含一个官方的 [可访问性插件](https://storybook.js.org/addons/@storybook/addon-a11y)。该插件由 Deque 的 [axe-core](https://github.com/dequelabs/axe-core) 提供支持，能够发现高达 [57% 的 WCAG 问题](https://www.deque.com/blog/automated-testing-study-identifies-57-percent-of-digital-accessibility-issues/)。
 
-Let's see how it works! Run the following command to install the addon:
+让我们看看它是如何工作的！运行以下命令来安装该插件：
 
 ```shell
 yarn add --dev @storybook/addon-a11y
 ```
 
-Then, update your Storybook configuration file (`.storybook/main.js`) to enable it:
+然后，更新你的 Storybook 配置文件（`.storybook/main.js`）以启用它：
 
 ```diff:title=.storybook/main.js
 /** @type { import('@storybook/react-vite').StorybookConfig } */
@@ -355,11 +355,11 @@ const config = {
 export default config;
 ```
 
-Finally, restart your Storybook to see the new addon enabled in the UI.
+最后，重新启动你的 Storybook，以查看 UI 中启用的新插件。
 
 ![Task accessibility issue in Storybook](/intro-to-storybook/finished-task-states-accessibility-issue-7-0.png)
 
-Cycling through our stories, we can see that the addon found an accessibility issue with one of our test states. The message [**"Elements must have sufficient color contrast"**](https://dequeuniversity.com/rules/axe/4.4/color-contrast?application=axeAPI) essentially means there isn't enough contrast between the task title and the background. We can quickly fix it by changing the text color to a darker gray in our application's CSS (located in `src/index.css`).
+在浏览我们的 stories 时，我们可以看到插件在我们一个测试状态中发现了一个可访问性问题。消息 [**“元素必须具有足够的颜色对比度”**](https://dequeuniversity.com/rules/axe/4.4/color-contrast?application=axeAPI) 基本上意味着任务标题与背景之间的对比度不足。我们可以通过在应用程序的 CSS 文件（位于 `src/index.css`）中将文本颜色更改为更深的灰色来快速修复这个问题。
 
 ```diff:title=src/index.css
 .list-item.TASK_ARCHIVED input[type="text"] {
@@ -369,8 +369,8 @@ Cycling through our stories, we can see that the addon found an accessibility is
 }
 ```
 
-That's it! We've taken the first step to ensure that UI becomes accessible. As we continue to add complexity to our application, we can repeat this process for all other components without needing to spin up additional tools or testing environments.
+就是这样！我们已经迈出了确保 UI 可访问性的第一步。随着我们继续增加应用程序的复杂性，我们可以对所有其他组件重复这一过程，而无需启动额外的工具或测试环境。
 
 <div class="aside">
-💡 Don't forget to commit your changes with git!
+💡 别忘了用 git 提交你的更改！
 </div>
