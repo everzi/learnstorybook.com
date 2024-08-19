@@ -1,27 +1,27 @@
 ---
-title: 'Assemble a composite component'
-tocTitle: 'Composite component'
-description: 'Assemble a composite component out of simpler components'
+title: '组装复合组件'
+tocTitle: '复合组件'
+description: '从较为简单的组件组装复合组件'
 commit: '429780a'
 ---
 
-Last chapter, we built our first component; this chapter extends what we learned to make TaskList, a list of Tasks. Let’s combine components together and see what happens when we introduce more complexity.
+上一章中，我们构建了第一个组件；本章将扩展我们学到的内容，创建一个 TaskList，任务列表。让我们将组件组合在一起，看看在引入更多复杂性时会发生什么。
 
-## Tasklist
+## Tasklist 组件
 
-Taskbox emphasizes pinned tasks by positioning them above default tasks. It yields two variations of `TaskList` you need to create stories for, default and pinned items.
+Taskbox 通过将固定的任务置于默认任务之上来强调它们。这会产生 `TaskList` 的两种变体：默认任务和固定任务。你需要为这两种情况创建 stories。
 
 ![default and pinned tasks](/intro-to-storybook/tasklist-states-1.png)
 
-Since `Task` data can be sent asynchronously, we **also** need a loading state to render in the absence of a connection. In addition, we require an empty state for when there are no tasks.
+由于 `Task` 数据可能会异步发送，我们**还**需要一个加载状态，以便在没有连接时渲染。此外，当没有任务时，我们还需要一个空状态。
 
 ![empty and loading tasks](/intro-to-storybook/tasklist-states-2.png)
 
-## Get set up
+## 做好准备
 
-A composite component isn’t much different from the basic components it contains. Create a `TaskList` component and an accompanying story file: `src/components/TaskList.jsx` and `src/components/TaskList.stories.jsx`.
+复合组件与其包含的基本组件并没有太大区别。创建一个 `TaskList` 组件以及一个对应的 story 文件：`src/components/TaskList.jsx` 和 `src/components/TaskList.stories.jsx`。
 
-Start with a rough implementation of the `TaskList`. You’ll need to import the `Task` component from earlier and pass in the attributes and actions as inputs.
+从粗略实现 `TaskList` 开始。你需要导入之前的 `Task` 组件，并将属性和操作作为输入传递给它。
 
 ```jsx:title=src/components/TaskList.jsx
 import Task from './Task';
@@ -50,7 +50,7 @@ export default function TaskList({ loading, tasks, onPinTask, onArchiveTask }) {
 }
 ```
 
-Next, create `Tasklist`’s test states in the story file.
+接下来，在 story 文件中为 `TaskList` 创建测试状态。
 
 ```jsx:title=src/components/TaskList.stories.jsx
 import TaskList from './TaskList';
@@ -110,13 +110,13 @@ export const Empty = {
 
 <div class="aside">
 
-💡[**Decorators**](https://storybook.js.org/docs/writing-stories/decorators) are a way to provide arbitrary wrappers to stories. In this case we’re using a decorator key on the default export to add some `margin` around the rendered component. They can also be used to wrap stories in “providers”-–i.e., library components that set React context.
+💡[**装饰器**](https://storybook.js.org/docs/writing-stories/decorators) 是为 stories 提供任意包装的一种方式。在本例中，我们使用默认导出的装饰器键来为渲染的组件周围添加一些 `margin`。装饰器还可以用于将 stories 包装在“提供者”中，即设置 React 上下文的库组件。
 
 </div>
 
-By importing `TaskStories`, we were able to [compose](https://storybook.js.org/docs/writing-stories/args#args-composition) the arguments (args for short) in our stories with minimal effort. That way, the data and actions (mocked callbacks) expected by both components are preserved.
+通过导入 `TaskStories`，我们能够轻松地[组合](https://storybook.js.org/docs/writing-stories/args#args-composition)stories 中的参数（简称 args）。这样，两个组件所期望的数据和操作（模拟回调）都得以保留。
 
-Now check Storybook for the new `TaskList` stories.
+现在检查 Storybook 是否有新的 `TaskList` stories。
 
 <video autoPlay muted playsInline loop>
   <source
@@ -125,9 +125,9 @@ Now check Storybook for the new `TaskList` stories.
   />
 </video>
 
-## Build out the states
+## 构建状态
 
-Our component is still rough, but now we have an idea of the stories to work toward. You might be thinking that the `.list-items` wrapper is overly simplistic. You're right – in most cases, we wouldn’t create a new component just to add a wrapper. But the **real complexity** of the `TaskList` component is revealed in the edge cases `withPinnedTasks`, `loading`, and `empty`.
+我们的组件仍然很粗糙，但现在我们对将要实现的 stories 有了一个概念。你可能会觉得 `.list-items` 包装器过于简单。没错——在大多数情况下，我们不会创建一个新组件，仅仅是添加一个包装器而已。但 `TaskList` 组件的**真正复杂性**体现在边界情况 `withPinnedTasks`、`loading` 和 `empty` 上。
 
 ```jsx:title=src/components/TaskList.jsx
 import Task from './Task';
@@ -183,7 +183,7 @@ export default function TaskList({ loading, tasks, onPinTask, onArchiveTask }) {
 }
 ```
 
-The added markup results in the following UI:
+添加的标记生成了以下 UI：
 
 <video autoPlay muted playsInline loop>
   <source
@@ -192,11 +192,11 @@ The added markup results in the following UI:
   />
 </video>
 
-Note the position of the pinned item in the list. We want the pinned item to render at the top of the list to make it a priority for our users.
+注意列表中固定项的位置。我们希望固定项渲染在列表顶部，以便将其优先展示给用户。
 
-## Data requirements and props
+## 数据要求和属性
 
-As the component grows, so do input requirements. Define the prop requirements of `TaskList`. Because `Task` is a child component, make sure to provide data in the right shape to render it. To save time and headache, reuse the `propTypes` you defined in `Task` earlier.
+随着组件的扩展，输入要求也会增加。定义 `TaskList` 的属性要求。由于 `Task` 是子组件，请确保提供正确的数据格式以便渲染它。为了节省时间和避免麻烦，重用你之前在 `Task` 中定义的 `propTypes`。
 
 ```diff:title=src/components/TaskList.jsx
 + import PropTypes from 'prop-types';
@@ -269,5 +269,5 @@ export default function TaskList({ loading, tasks, onPinTask, onArchiveTask }) {
 ```
 
 <div class="aside">
-💡 Don't forget to commit your changes with git!
+💡 别忘了用 git 提交你的更改！
 </div>
