@@ -1,27 +1,27 @@
 ---
-title: 'Wire in data'
-tocTitle: 'Data'
-description: 'Learn how to wire in data to your UI component'
+title: '连接数据'
+tocTitle: '数据'
+description: '了解如何将数据连接到你的UI组件'
 commit: 'c70ec15'
 ---
 
-So far, we have created isolated stateless components-–great for Storybook, but ultimately not helpful until we give them some data in our app.
+到目前为止，我们已经创建了独立的无状态组件——这对于 Storybook 很有用，但最终要在应用中赋予它们一些数据才有用。
 
-This tutorial doesn’t focus on the particulars of building an app, so we won’t dig into those details here. But we will take a moment to look at a common pattern for wiring in data into connected components.
+这篇教程不专注于构建应用程序的细节，因此我们不会深入探讨这些内容。但我们会花一点时间来看一下将数据接入到连接的组件中的一种常见模式。
 
-## Connected components
+## 连接的组件
 
-Our `TaskList` component as currently written is “presentational” in that it doesn’t talk to anything external to its own implementation. We need to wire it to a data provider to get data into it.
+我们当前编写的 `TaskList` 组件是“展示型”的，因为它不与自身实现之外的任何外部内容交互。我们需要将其连接到数据提供者，以获取数据。
 
-This example uses [Redux Toolkit](https://redux-toolkit.js.org/), the most effective toolset for developing applications for storing data with [Redux](https://redux.js.org/), to build a simple data model for our app. However, the pattern used here applies just as well to other data management libraries like [Apollo](https://www.apollographql.com/client/) and [MobX](https://mobx.js.org/).
+本示例使用 [Redux Toolkit](https://redux-toolkit.js.org/)，这是使用 [Redux](https://redux.js.org/) 开发用于存储数据的应用程序最有效的工具集，来为我们的应用构建一个简单的数据模型。不过，这里使用的模式同样适用于其他数据管理库，如 [Apollo](https://www.apollographql.com/client/) 和 [MobX](https://mobx.js.org/)。
 
-Add the necessary dependencies to your project with:
+将必要的依赖项添加到你的项目中：
 
 ```shell
 yarn add @reduxjs/toolkit react-redux
 ```
 
-First, we’ll construct a simple Redux store that responds to actions that change the task's state in a file called `store.js` in the `src/lib` directory (intentionally kept simple):
+首先，我们将在 `src/lib` 目录中的一个名为 `store.js` 的文件中构建一个简单的 Redux store，它响应更改任务状态的操作（为了保持简洁）：
 
 ```js:title=src/lib/store.js
 /* A simple redux store/actions/reducer implementation.
@@ -81,7 +81,7 @@ const store = configureStore({
 export default store;
 ```
 
-Then we’ll update our `TaskList` component to connect to the Redux store and render the tasks we are interested in:
+然后，我们将更新 `TaskList` 组件，使其连接到 Redux store 并渲染我们感兴趣的任务：
 
 ```jsx:title=src/components/TaskList.jsx
 import Task from './Task';
@@ -162,17 +162,17 @@ export default function TaskList() {
 }
 ```
 
-Now that we have some actual data populating our component, obtained from the Redux store, we could have wired it to `src/App.js` and render the component there. But for now, let's hold off doing that and continue on our component-driven journey.
+现在，我们已经从 Redux store 获取了一些实际数据来填充我们的组件，我们可以将其连接到 `src/App.js` 并在其中渲染组件。但目前先不这样做，继续我们的组件驱动之旅。
 
-Don't worry about it. We'll take care of it in the next chapter.
+不用担心，我们会在下一章处理这个问题。
 
-## Supplying context with decorators
+## 使用装饰器提供上下文
 
-Our Storybook stories have stopped working with this change because our `Tasklist` is now a connected component since it relies on a Redux store to retrieve and update our tasks.
+由于我们的`TaskList` 现在是一个连接组件，依赖于 Redux store 来获取和更新任务，因此我们的 Storybook stories 在这个更改后停止工作了。
 
 ![Broken tasklist](/intro-to-storybook/broken-tasklist-7-0-optimized.png)
 
-We can use various approaches to solve this issue. Still, as our app is pretty straightforward, we can rely on a decorator, similar to what we did in the [previous chapter](/intro-to-storybook/react/en/composite-component) and provide a mocked store-- in our Storybook stories:
+我们可以使用多种方法来解决这个问题。尽管如此，由于我们的应用程序相对简单，我们可以依赖装饰器，类似于我们在[上一章](/intro-to-storybook/react/en/composite-component)中所做的，在 Storybook stories 中提供一个模拟的 store：
 
 ```jsx:title=src/components/TaskList.stories.jsx
 import TaskList from './TaskList';
@@ -291,7 +291,7 @@ export const Empty = {
 
 <div class="aside">
 
-💡 `excludeStories` is a Storybook configuration field that prevents our mocked state to be treated as a story. You can read more about this field in the [Storybook documentation](https://storybook.js.org/docs/api/csf).
+💡 `excludeStories` 是一个 Storybook 配置字段，用于防止我们的模拟状态被当作一个 story 处理。你可以在 [Storybook 文档](https://storybook.js.org/docs/api/csf) 中了解更多关于这个字段的信息。
 
 </div>
 
@@ -303,7 +303,7 @@ export const Empty = {
 </video>
 
 <div class="aside">
-💡 Don't forget to commit your changes with git!
+💡 别忘了用 git 提交你的更改！
 </div>
 
-Success! We're right where we started, our Storybook is now working, and we're able to see how we could supply data into a connected component. In the next chapter, we'll take what we've learned here and apply it to a screen.
+成功！我们回到了最初的位置，我们的 Storybook 现在可以正常工作，并且我们能够看到如何将数据提供给连接组件。在下一章中，我们将利用这里学到的知识和把它应用到一个屏幕上。
