@@ -1,19 +1,19 @@
 ---
-title: 'Construct a screen'
-tocTitle: 'Screens'
-description: 'Construct a screen out of components'
+title: '构建一个页面'
+tocTitle: '页面'
+description: '用组件构建一个页面'
 commit: '2275632'
 ---
 
-We've concentrated on building UIs from the bottom up, starting small and adding complexity. Doing so has allowed us to develop each component in isolation, figure out its data needs, and play with it in Storybook. All without needing to stand up a server or build out screens!
+我们专注于从下到上构建 UI，从小处开始，逐步增加复杂性。这使我们能够在隔离的环境中开发每个组件，弄清楚它的数据需求，并在 Storybook 中进行测试。所有这些都不需要启动服务器或构建屏幕！
 
-In this chapter, we continue to increase the sophistication by combining components in a screen and developing that screen in Storybook.
+在本章中，我们通过将组件组合到一个界面中并在 Storybook 中开发该界面，进一步提升复杂性。
 
-## Connected screens
+## 连接页面
 
-As our app is straightforward, the screen we'll build is pretty trivial, simply fetching data from a remote API, wrapping the `TaskList` component (which supplies its own data from Redux), and pulling a top-level `error` field out of Redux.
+由于我们的应用程序相对简单，我们要构建的界面也很容易，它只是从远程 API 获取数据，封装 `TaskList` 组件（该组件从 Redux 提供自己的数据），并从 Redux 中提取顶层的 `error` 字段。
 
-We'll start by updating our Redux store (in `src/lib/store.js`) to connect to a remote API and handle the various states for our application (i.e., `error`, `succeeded`):
+我们将首先更新 Redux 存储（位于 `src/lib/store.js`），以连接到远程 API，并处理应用程序的各种状态（例如 `error`、`succeeded`）：
 
 ```diff:title=src/lib/store.js
 /* A simple redux store/actions/reducer implementation.
@@ -113,7 +113,7 @@ const store = configureStore({
 export default store;
 ```
 
-Now that we've updated our store to retrieve the data from a remote API endpoint and prepared it to handle the various states of our app, let's create our `InboxScreen.jsx` in the `src/components` directory:
+现在，我们已经更新了存储，以从远程 API 端点获取数据，并准备好处理应用程序的各种状态，接下来让我们在 `src/components` 目录中创建 `InboxScreen.jsx` 文件：
 
 ```jsx:title=src/components/InboxScreen.jsx
 import { useEffect } from 'react';
@@ -155,7 +155,7 @@ export default function InboxScreen() {
 }
 ```
 
-We also need to change our `App` component to render the `InboxScreen` (eventually, we would use a router to choose the correct screen, but let's not worry about that here):
+我们还需要修改 `App` 组件以渲染 `InboxScreen`（最终，我们会使用路由来选择正确的界面，但这里暂时不用担心这个问题）：
 
 ```diff:title=src/App.jsx
 - import { useState } from 'react'
@@ -202,9 +202,9 @@ function App() {
 export default App;
 ```
 
-However, where things get interesting is in rendering the story in Storybook.
+不过，有趣的地方在于如何在 Storybook 中渲染。
 
-As we saw previously, the `TaskList` component is now a **connected** component and relies on a Redux store to render the tasks. As our `InboxScreen` is also a connected component, we'll do something similar and provide a store to the story. So when we set our stories in `InboxScreen.stories.jsx`:
+正如我们之前所看到的，`TaskList` 组件现在是一个 **连接** 组件，依赖于 Redux 存储来渲染任务。由于我们的 `InboxScreen` 也是一个连接组件，我们将采取类似的方法，向 story 中提供一个存储。因此，当我们在 `InboxScreen.stories.jsx` 中设置我们的 stories 时：
 
 ```jsx:title=src/components/InboxScreen.stories.jsx
 import InboxScreen from './InboxScreen';
@@ -224,23 +224,23 @@ export const Default = {};
 export const Error = {};
 ```
 
-We can quickly spot an issue with the `error` story. Instead of displaying the right state, it shows a list of tasks. One way to sidestep this issue would be to provide a mocked version for each state, similar to what we did in the last chapter. Instead, we'll use a well-known API mocking library alongside a Storybook addon to help us solve this issue.
+我们可以很快发现 `error` story 存在一个问题。它显示了一组任务，而不是正确的状态。回避这个问题的一种方法是为每种状态提供一个模拟版本，类似于我们在上一章中所做的。相反，我们将使用一个知名的 API 模拟库，并结合 Storybook 插件来帮助我们解决这个问题。
 
 ![Broken inbox screen state](/intro-to-storybook/broken-inbox-error-state-7-0-optimized.png)
 
-## Mocking API Services
+## 模拟 API 服务
 
-As our application is pretty straightforward and doesn't depend too much on remote API calls, we're going to use [Mock Service Worker](https://mswjs.io/) and [Storybook's MSW addon](https://storybook.js.org/addons/msw-storybook-addon). Mock Service Worker is an API mocking library. It relies on service workers to capture network requests and provides mocked data in responses.
+由于我们的应用程序相对简单且不过多依赖远程 API 调用，我们将使用 [Mock Service Worker](https://mswjs.io/) 和 [Storybook 的 MSW 插件](https://storybook.js.org/addons/msw-storybook-addon)。Mock Service Worker 是一个 API 模拟库，它依赖于服务工作者来捕获网络请求，并在响应中提供模拟数据。
 
-When we set up our app in the [Get started section](/intro-to-storybook/react/en/get-started) both packages were also installed. All that remains is to configure them and update our stories to use them.
+在我们按照 [入门指南](/intro-to-storybook/react/en/get-started) 设置应用程序时，这两个包也已安装。我们只需配置它们并更新我们的 stories 使用它们即可。
 
-In your terminal, run the following command to generate a generic service worker inside your `public` folder:
+在终端中运行以下命令，以在 `public` 文件夹中生成一个通用的服务工作者：
 
 ```shell
 yarn init-msw
 ```
 
-Then, we'll need to update our `.storybook/preview.js` and initialize them:
+接下来，我们需要更新 `.storybook/preview.js` 并初始化它们：
 
 ```diff:title=.storybook/preview.js
 import '../src/index.css';
@@ -268,7 +268,7 @@ const preview = {
 export default preview;
 ```
 
-Finally, update the `InboxScreen` stories and include a [parameter](https://storybook.js.org/docs/writing-stories/parameters) that mocks the remote API calls:
+最后，更新 `InboxScreen` 的 stories，并包含一个用于模拟远程 API 调用的 [参数](https://storybook.js.org/docs/writing-stories/parameters)：
 
 ```diff:title=src/components/InboxScreen.stories.jsx
 import InboxScreen from './InboxScreen';
@@ -317,11 +317,11 @@ export const Error = {
 
 <div class="aside">
 
-💡 As an aside, passing data down the hierarchy is a legitimate approach, especially when using [GraphQL](http://graphql.org/). It’s how we have built [Chromatic](https://www.chromatic.com/?utm_source=storybook_website&utm_medium=link&utm_campaign=storybook) alongside 800+ stories.
+💡 顺便说一下，通过层级传递数据是一种合理的方法，尤其是在使用 [GraphQL](http://graphql.org/) 时。这也是我们如何与 800+ stories 一起构建 [Chromatic](https://www.chromatic.com/?utm_source=storybook_website&utm_medium=link&utm_campaign=storybook) 的方式。
 
 </div>
 
-Check your Storybook, and you'll see that the `error` story is now working as intended. MSW intercepted our remote API call and provided the appropriate response.
+检查你的 Storybook，你会发现 `error` story 现在按预期工作了。MSW 截获了我们的远程 API 调用，并提供了相应的响应。
 
 <video autoPlay muted playsInline loop>
   <source
@@ -330,21 +330,21 @@ Check your Storybook, and you'll see that the `error` story is now working as in
   />
 </video>
 
-## Interaction tests
+## 交互测试
 
-So far, we've been able to build a fully functional application from the ground up, starting from a simple component up to a screen and continuously testing each change using our stories. But each new story also requires a manual check on all the other stories to ensure the UI doesn't break. That's a lot of extra work.
+到目前为止，我们已经能够从零开始构建一个功能齐全的应用程序，从一个简单的组件到一个界面，并使用我们的 stories 不断测试每个更改。但每个新 story 还需要手动检查所有其他 stories ，以确保 UI 没有问题。这是了不少额外的工作量。
 
-Can't we automate this workflow and test our component interactions automatically?
+难道我们不能自动化这个流程，并自动测试组件的交互吗？
 
-### Write an interaction test using the play function
+### 使用 `play` 函数编写一个交互测试。
 
-Storybook's [`play`](https://storybook.js.org/docs/writing-stories/play-function) and [`@storybook/addon-interactions`](https://storybook.js.org/docs/writing-tests/interaction-testing) help us with that. A play function includes small snippets of code that run after the story renders.
+Storybook 的 [`play`](https://storybook.js.org/docs/writing-stories/play-function) 函数和 [`@storybook/addon-interactions`](https://storybook.js.org/docs/writing-tests/interaction-testing) 可以帮助我们实现这一点。一个 play 函数包含在 story 渲染后运行的小段代码。
 
-The play function helps us verify what happens to the UI when tasks are updated. It uses framework-agnostic DOM APIs, which means we can write stories with the play function to interact with the UI and simulate human behavior no matter the frontend framework.
+play 函数帮助我们验证在任务更新时 UI 会发生什么。它使用与框架无关的 DOM API，这意味着无论使用何种前端框架，我们可以使用 play 函数编写 stories，以与 UI 交互并模拟人类行为。
 
-The `@storybook/addon-interactions` helps us visualize our tests in Storybook, providing a step-by-step flow. It also offers a handy set of UI controls to pause, resume, rewind, and step through each interaction.
+`@storybook/addon-interactions` 帮助我们在 Storybook 中可视化测试，提供了循序渐进的流程。它还提供了一套方便的 UI 控件集，用于暂停、恢复、倒退和逐步查看每个交互。
 
-Let's see it in action! Update your newly created `InboxScreen` story, and set up component interactions by adding the following:
+让我们来看看它的实际效果！更新你新创建的 `InboxScreen` story，并通过添加以下内容来设置组件交互：
 
 ```diff:title=src/components/InboxScreen.stories.jsx
 import InboxScreen from './InboxScreen';
@@ -412,11 +412,11 @@ export const Error = {
 
 <div class="aside">
 
-💡 The `@storybook/test` package replaces the `@storybook/jest` and `@storybook/testing-library` testing packages, offering a smaller bundle size and a more straightforward API based on the [Vitest](https://vitest.dev/) package.
+💡 `@storybook/test` 包替代了 `@storybook/jest` 和 `@storybook/testing-library` 测试包，提供了更小的包体积和更简洁的 API，基于 [Vitest](https://vitest.dev/) 包。
 
 </div>
 
-Check the `Default` story. Click the `Interactions` panel to see the list of interactions inside the story's play function.
+检查 `Default` story。点击 `Interactions` 面板，以查看 story 的 play 函数中的交互列表。
 
 <video autoPlay muted playsInline loop>
   <source
@@ -425,21 +425,21 @@ Check the `Default` story. Click the `Interactions` panel to see the list of int
   />
 </video>
 
-### Automate tests with the test runner
+### 使用测试运行器自动化测试
 
-With Storybook's play function, we were able to sidestep our problem, allowing us to interact with our UI and quickly check how it responds if we update our tasks—keeping the UI consistent at no extra manual effort.
+通过使用 Storybook 的 play 函数，我们能够绕过问题，允许我们与 UI 进行交互，并快速检查它如何响应如果我们更新任务时——这样可以保持 UI 的一致性，而无需额外的手动工作。
 
-But, if we take a closer look at our Storybook, we can see that it only runs the interaction tests when viewing the story. Therefore, we'd still have to go through each story to run all checks if we make a change. Couldn't we automate it?
+但是，如果我们仔细查看 Storybook，会发现它仅在查看故事时运行交互测试。因此，如果我们做了更改，仍然需要逐一查看每个 story 来运行所有检查。我们可以自动化这个过程吗？
 
-The good news is that we can! Storybook's [test runner](https://storybook.js.org/docs/writing-tests/test-runner) allows us to do just that. It's a standalone utility—powered by [Playwright](https://playwright.dev/)—that runs all our interactions tests and catches broken stories.
+好消息是我们可以做到！Storybook 的 [测试运行器](https://storybook.js.org/docs/writing-tests/test-runner) 允许我们这么做。它是一个独立的工具，由 [Playwright](https://playwright.dev/) 提供支持，可以运行我们所有的交互测试并捕捉出问题的 stories。
 
-Let's see how it works! Run the following command to install it:
+让我们看看它如何工作！运行以下命令来安装它：
 
 ```shell
 yarn add --dev @storybook/test-runner
 ```
 
-Next, update your `package.json` `scripts` and add a new test task:
+接下来，更新你 `package.json` 文件中的 `scripts`，并添加一个新的测试任务：
 
 ```json:clipboard=false
 {
@@ -449,7 +449,7 @@ Next, update your `package.json` `scripts` and add a new test task:
 }
 ```
 
-Finally, with your Storybook running, open up a new terminal window and run the following command:
+最后，在 Storybook 运行的情况下，打开一个新的终端窗口并运行以下命令：
 
 ```shell
 yarn test-storybook --watch
@@ -457,19 +457,19 @@ yarn test-storybook --watch
 
 <div class="aside">
 
-💡 Interaction testing with the play function is a fantastic way to test your UI components. It can do much more than we've seen here; we recommend reading the [official documentation](https://storybook.js.org/docs/writing-tests/interaction-testing) to learn more about it.
+💡 使用 play 函数进行交互测试是测试 UI 组件的绝佳方式。它的功能远不止我们在这里看到的这些；建议你阅读 [官方文档](https://storybook.js.org/docs/writing-tests/interaction-testing) 以了解更多内容。
 
-For an even deeper dive into testing, check out the [Testing Handbook](/ui-testing-handbook). It covers testing strategies used by scaled-front-end teams to supercharge your development workflow.
+如果想深入了解测试内容，可以查看 [测试手册](/ui-testing-handbook)。它涵盖了大规模前端团队使用的测试策略，可以大大提升你的开发流程。
 
 </div>
 
 ![Storybook test runner successfully runs all tests](/intro-to-storybook/storybook-test-runner-execution.png)
 
-Success! Now we have a tool that helps us verify whether all our stories are rendered without errors and all assertions pass automatically. What's more, if a test fails, it will provide us with a link that opens up the failing story in the browser.
+成功了！现在我们有一个工具，可以帮助我们自动验证所有 stories 是否无错误地渲染，并且所有断言是否通过。此外，如果测试失败，它会提供一个链接，点击即可在浏览器中打开失败的 story。
 
-## Component-Driven Development
+## 组件驱动开发
 
-We started from the bottom with `Task`, then progressed to `TaskList`, and now we’re here with a whole screen UI. Our `InboxScreen` accommodates connected components and includes accompanying stories.
+我们从 `Task` 组件开始，然后发展到 `TaskList`，现在我们这里有了一个完整的屏幕 UI。我们的 `InboxScreen` 包含了连接的组件，并包括了相应的 stories。
 
 <video autoPlay muted playsInline loop style="width:480px; height:auto; margin: 0 auto;">
   <source
@@ -478,10 +478,10 @@ We started from the bottom with `Task`, then progressed to `TaskList`, and now w
   />
 </video>
 
-[**Component-Driven Development**](https://www.componentdriven.org/) allows you to gradually expand complexity as you move up the component hierarchy. Among the benefits are a more focused development process and increased coverage of all possible UI permutations. In short, CDD helps you build higher-quality and more complex user interfaces.
+[**组件驱动开发**](https://www.componentdriven.org/) 允许你随着组件层级的上升逐步扩展复杂性。其优势包括更专注的开发过程和所有可能的 UI 变体的覆盖范围。简而言之，CDD 帮助你构建更高质量、更复杂的用户界面。
 
-We’re not done yet - the job doesn't end when the UI is built. We also need to ensure that it remains durable over time.
+我们还没完成——UI 构建完成后工作还没结束。我们还需要确保它能够随着时间的推移保持耐用。
 
 <div class="aside">
-💡 Don't forget to commit your changes with git!
+💡 别忘了用 git 提交你的更改！
 </div>
